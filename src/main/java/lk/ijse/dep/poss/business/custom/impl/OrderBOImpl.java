@@ -6,7 +6,6 @@ import lk.ijse.dep.poss.dao.DAOType;
 import lk.ijse.dep.poss.dao.custom.ItemDAO;
 import lk.ijse.dep.poss.dao.custom.OrderDetailDAO;
 import lk.ijse.dep.poss.dao.custom.OrdersDAO;
-import lk.ijse.dep.poss.db.HibernateUtil;
 import lk.ijse.dep.poss.entity.Item;
 import lk.ijse.dep.poss.entity.OrderDetail;
 import lk.ijse.dep.poss.entity.Orders;
@@ -16,6 +15,7 @@ import lk.ijse.dep.poss.util.OrderDetailTM;
 import lk.ijse.dep.poss.util.OrderTM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -23,7 +23,7 @@ import java.sql.Date;
 import java.util.List;
 
 @Component
-
+@Transactional
 public class OrderBOImpl implements OrderBO { // , Temp
 
 //    private OrdersDAO orderDAO = DAOFactory.getInstance().getDAO(DAOType.ORDER);;
@@ -50,24 +50,7 @@ public class OrderBOImpl implements OrderBO { // , Temp
 
     public String getNewOrderId() throws Exception {
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        orderDAO.setSession(session);
-        Transaction tx=null;
-
-        String lastOrderId=null;
-        try {
-            tx=session.beginTransaction();
-
-            lastOrderId = orderDAO.getLastOrderId();
-
-            tx.commit();
-        }catch (Throwable th){
-            th.printStackTrace();
-            tx.rollback();
-        }finally {
-            session.clear();
-        }
-
+          String lastOrderId = orderDAO.getLastOrderId();
 
 
         if (lastOrderId == null) {
@@ -89,16 +72,6 @@ public class OrderBOImpl implements OrderBO { // , Temp
 
     public void placeOrder(OrderTM order, List<OrderDetailTM> orderDetails) throws Exception {
 
-        Session session = HibernateUtil.getSessionFactory().openSession();
-        orderDAO.setSession(session);
-        orderDetailDAO.setSession(session);
-        itemDAO.setSession(session);
-
-        Transaction tx=null;
-
-        try {
-            tx=session.beginTransaction();
-
             orderDAO.save(new Orders(order.getOrderId(),
                     Date.valueOf(order.getOrderDate()),
                     order.getCustomerId()));
@@ -114,13 +87,6 @@ public class OrderBOImpl implements OrderBO { // , Temp
 //                new ItemDAOImpl().update(item);
             }
 
-            tx.commit();
-        }catch (Throwable th){
-            th.printStackTrace();
-            tx.rollback();
-        }finally {
-            session.clear();
-        }
 
 //        try {
 //            connection.setAutoCommit(false);

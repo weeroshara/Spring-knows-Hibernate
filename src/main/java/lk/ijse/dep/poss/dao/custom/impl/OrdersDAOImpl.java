@@ -3,6 +3,8 @@ package lk.ijse.dep.poss.dao.custom.impl;
 import lk.ijse.dep.poss.dao.custom.OrdersDAO;
 import lk.ijse.dep.poss.entity.Orders;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -12,12 +14,8 @@ import java.util.List;
 public class OrdersDAOImpl implements OrdersDAO {
 
 
-    private Session session;
-
-    @Override
-    public void setSession(Session session) {
-        this.session=session;
-    }
+    @Autowired
+    private SessionFactory sessionFactory;
 
     @Override
     public String getLastOrderId() {
@@ -34,7 +32,7 @@ public class OrdersDAOImpl implements OrdersDAO {
 //            throwables.printStackTrace();
 //            return null;
 //        }
-        return (String) session.createNativeQuery("SELECT o.orderID FROM Orders o ORDER BY o.orderID DESC LIMIT 1").uniqueResult();
+        return (String) getSession().createNativeQuery("SELECT o.orderID FROM Orders o ORDER BY o.orderID DESC LIMIT 1").uniqueResult();
     }
 
     @Override
@@ -54,7 +52,7 @@ public class OrdersDAOImpl implements OrdersDAO {
 //            throwables.printStackTrace();
 //            return null;
 //        }
-        return session.createQuery("FROM entity.Orders").list();
+        return getSession().createQuery("FROM entity.Orders").list();
     }
 
     @Override
@@ -74,7 +72,7 @@ public class OrdersDAOImpl implements OrdersDAO {
 //            throwables.printStackTrace();
 //            return null;
 //        }
-        return session.get(Orders.class,key);
+        return getSession().get(Orders.class,key);
     }
 
     @Override
@@ -90,7 +88,7 @@ public class OrdersDAOImpl implements OrdersDAO {
 //        } catch (SQLException throwables) {
 //            throwables.printStackTrace();
 //        }
-        session.save(entity);
+        getSession().save(entity);
     }
 
     @Override
@@ -106,7 +104,7 @@ public class OrdersDAOImpl implements OrdersDAO {
 //        } catch (SQLException throwables) {
 //            throwables.printStackTrace();
 //        }
-        session.update(entity);
+        getSession().update(entity);
     }
 
     @Override
@@ -119,6 +117,11 @@ public class OrdersDAOImpl implements OrdersDAO {
 //        } catch (SQLException throwables) {
 //            throwables.printStackTrace();
 //        }
-        session.delete(session.get(Orders.class,key));
+        getSession().delete(getSession().get(Orders.class,key));
+    }
+
+    @Override
+    public Session getSession() {
+        return sessionFactory.getCurrentSession();
     }
 }

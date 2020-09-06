@@ -4,7 +4,9 @@ import org.hibernate.Session;
 
 public interface SuperDAO <T,ID>{
 
-    public void setSession(Session session);
+//    public void setSession(Session session);
+
+    public Session getSession();
 
 //    List<T>findAll() throws Exception;
 //

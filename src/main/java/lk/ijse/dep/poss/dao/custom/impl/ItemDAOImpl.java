@@ -3,6 +3,8 @@ package lk.ijse.dep.poss.dao.custom.impl;
 import lk.ijse.dep.poss.dao.custom.ItemDAO;
 import lk.ijse.dep.poss.entity.Item;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -11,13 +13,9 @@ import java.util.List;
 
 public class ItemDAOImpl implements ItemDAO {
 
-    private Session session;
+    @Autowired
+    private SessionFactory sessionFactory;
 
-    @Override
-    public void setSession(Session session) {
-        this.session=session;
-
-    }
 
     @Override
     public String getLastItemCode() {
@@ -34,7 +32,7 @@ public class ItemDAOImpl implements ItemDAO {
 //            throwables.printStackTrace();
 //            return null;
 //        }
-        return (String) session.createNativeQuery("SELECT i.itemCode FROM Item i ORDER BY i.itemCode DESC LIMIT 1").uniqueResult();
+        return (String) getSession().createNativeQuery("SELECT i.itemCode FROM Item i ORDER BY i.itemCode DESC LIMIT 1").uniqueResult();
     }
 
     @Override
@@ -55,7 +53,7 @@ public class ItemDAOImpl implements ItemDAO {
 //            throwables.printStackTrace();
 //            return null;
 //        }
-        return session.createNativeQuery("SELECT i.itemCode, i.description, i.unitPrice, i.qtyOnHand FROM Item i ",Item.class).list();
+        return getSession().createNativeQuery("SELECT i.itemCode, i.description, i.unitPrice, i.qtyOnHand FROM Item i ",Item.class).list();
     }
 
     @Override
@@ -76,7 +74,7 @@ public class ItemDAOImpl implements ItemDAO {
 //            throwables.printStackTrace();
 //            return null;
 //        }
-        return session.get(Item.class,key);
+        return getSession().get(Item.class,key);
     }
 
     @Override
@@ -93,7 +91,7 @@ public class ItemDAOImpl implements ItemDAO {
 //        } catch (SQLException throwables) {
 //            throwables.printStackTrace();
 //        }
-        session.save(entity);
+        getSession().save(entity);
 
 
     }
@@ -112,7 +110,7 @@ public class ItemDAOImpl implements ItemDAO {
 //        } catch (SQLException throwables) {
 //            throwables.printStackTrace();
 //        }
-        session.update(entity);
+        getSession().update(entity);
     }
 
     @Override
@@ -125,6 +123,11 @@ public class ItemDAOImpl implements ItemDAO {
 //        } catch (SQLException throwables) {
 //            throwables.printStackTrace();
 //        }
-        session.delete(session.get(Item.class,key));
+        getSession().delete(getSession().get(Item.class,key));
+    }
+
+    @Override
+    public Session getSession() {
+        return sessionFactory.getCurrentSession();
     }
 }

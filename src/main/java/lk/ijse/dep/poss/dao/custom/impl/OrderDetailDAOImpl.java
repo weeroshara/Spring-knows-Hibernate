@@ -4,6 +4,8 @@ import lk.ijse.dep.poss.dao.custom.OrderDetailDAO;
 import lk.ijse.dep.poss.entity.OrderDetail;
 import lk.ijse.dep.poss.entity.OrderDetailPK;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -12,12 +14,9 @@ import java.util.List;
 
 public class OrderDetailDAOImpl implements OrderDetailDAO {
 
-    private Session session;
+    @Autowired
+    private SessionFactory sessionFactory;
 
-    @Override
-    public void setSession(Session session) {
-        this.session=session;
-    }
 
     @Override
     public List<OrderDetail> findAll() {
@@ -37,7 +36,7 @@ public class OrderDetailDAOImpl implements OrderDetailDAO {
 //            throwables.printStackTrace();
 //            return null;
 //        }
-        return session.createQuery("FROM entity.OrderDetail").list();
+        return getSession().createQuery("FROM lk.ijse.dep.poss.entity.OrderDetail").list();
     }
 
     @Override
@@ -60,7 +59,7 @@ public class OrderDetailDAOImpl implements OrderDetailDAO {
 //            throwables.printStackTrace();
 //            return null;
 //        }
-        return session.createNativeQuery("SELECT od.orderId, od.itemCode, od.orderQty, od.unitPrice FROM OrderDetail od WHERE orderId=?1 AND itemCode=?2",OrderDetail.class)
+        return getSession().createNativeQuery("SELECT od.orderId, od.itemCode, od.orderQty, od.unitPrice FROM OrderDetail od WHERE orderId=?1 AND itemCode=?2",OrderDetail.class)
                 .setParameter(1,key.getOrderId())
                 .setParameter(2,key.getItemCode()).uniqueResult();
     }
@@ -79,7 +78,7 @@ public class OrderDetailDAOImpl implements OrderDetailDAO {
 //        } catch (SQLException throwables) {
 //            throwables.printStackTrace();
 //        }
-        session.save(entity);
+        getSession().save(entity);
     }
 
     @Override
@@ -96,7 +95,7 @@ public class OrderDetailDAOImpl implements OrderDetailDAO {
 //        } catch (SQLException throwables) {
 //            throwables.printStackTrace();
 //        }
-        session.update(entity);
+        getSession().update(entity);
     }
 
     @Override
@@ -112,6 +111,11 @@ public class OrderDetailDAOImpl implements OrderDetailDAO {
 //        } catch (SQLException throwables) {
 //            throwables.printStackTrace();
 //        }
-        session.delete(session.get(key.getItemCode(),key.getOrderId()));
+        getSession().delete(getSession().get(key.getItemCode(),key.getOrderId()));
+    }
+
+    @Override
+    public Session getSession() {
+        return sessionFactory.getCurrentSession();
     }
 }

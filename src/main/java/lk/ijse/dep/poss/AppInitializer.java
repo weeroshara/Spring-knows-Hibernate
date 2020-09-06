@@ -9,6 +9,8 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.io.IOException;
 
+
+
 public class AppInitializer extends Application {
 
     private static AnnotationConfigApplicationContext ctx;

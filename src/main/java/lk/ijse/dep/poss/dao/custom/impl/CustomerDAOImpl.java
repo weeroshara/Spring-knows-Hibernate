@@ -3,6 +3,8 @@ package lk.ijse.dep.poss.dao.custom.impl;
 import lk.ijse.dep.poss.dao.custom.CustomerDAO;
 import lk.ijse.dep.poss.entity.Customer;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -11,13 +13,9 @@ import java.util.List;
 
 public class CustomerDAOImpl implements CustomerDAO {
 
-    private Session session;
+    @Autowired
+    private SessionFactory sessionFactory;
 
-    @Override
-    public void setSession(Session session) {
-        this.session=session;
-
-    }
 
     @Override
     public String getLastCustomerId() {
@@ -34,7 +32,7 @@ public class CustomerDAOImpl implements CustomerDAO {
 //            throwables.printStackTrace();
 //            return null;
 //        }
-        return (String) session.createNativeQuery("SELECT c.customerId FROM Customer c ORDER BY c.customerId DESC LIMIT 1").uniqueResult();
+        return (String) getSession().createNativeQuery("SELECT c.customerId FROM Customer c ORDER BY c.customerId DESC LIMIT 1").uniqueResult();
 
     }
 
@@ -54,7 +52,7 @@ public class CustomerDAOImpl implements CustomerDAO {
 //            e.printStackTrace();
 //            return null;
 //        }
-        return session.createQuery("FROM lk.ijse.dep.poss.entity.Customer").list();
+        return getSession().createQuery("FROM lk.ijse.dep.poss.entity.Customer").list();
     }
 
     @Override
@@ -74,7 +72,7 @@ public class CustomerDAOImpl implements CustomerDAO {
 //            return null;
 //        }
 //        return (Customer) session.createQuery("SELECT c.customerId , c.customerName, c.customerAddress FROM lk.ijse.dep.poss.entity.Customer c").getSingleResult();
-        return session.get(Customer.class,key);
+        return getSession().get(Customer.class,key);
     }
 
     @Override
@@ -92,7 +90,7 @@ public class CustomerDAOImpl implements CustomerDAO {
 //            throwables.printStackTrace();
 //            return false;
 //        }
-        session.save(entity);
+        getSession().save(entity);
     }
 
     @Override
@@ -108,7 +106,7 @@ public class CustomerDAOImpl implements CustomerDAO {
 //        } catch (SQLException throwables) {
 //            throwables.printStackTrace();
 //        }
-        session.update(entity);
+        getSession().update(entity);
     }
 
     @Override
@@ -121,8 +119,12 @@ public class CustomerDAOImpl implements CustomerDAO {
 //        } catch (SQLException throwables) {
 //            throwables.printStackTrace();
 //        }
-        session.delete(session.get(Customer.class,key));
+        getSession().delete(getSession().get(Customer.class,key));
     }
 
+    @Override
+    public Session getSession() {
+        return sessionFactory.getCurrentSession();
+    }
 
 }
